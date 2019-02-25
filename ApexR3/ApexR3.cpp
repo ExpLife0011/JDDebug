@@ -288,6 +288,72 @@ typedef struct _PROCESS_BASIC_INFORMATION32 {
 	UINT32 UniqueProcessId;
 	UINT32 InheritedFromUniqueProcessId;
 }PROCESS_BASIC_INFORMATION32;
+typedef enum _SYSTEM_INFORMATION_CLASS     //    Q S
+{
+	SystemBasicInformation,                // 00 Y N
+	SystemProcessorInformation,            // 01 Y N
+	SystemPerformanceInformation,          // 02 Y N
+	SystemTimeOfDayInformation,            // 03 Y N
+	SystemNotImplemented1,                 // 04 Y N
+	SystemProcessesAndThreadsInformation,  // 05 Y N
+	SystemCallCounts,                      // 06 Y N
+	SystemConfigurationInformation,        // 07 Y N
+	SystemProcessorTimes,                  // 08 Y N
+	SystemGlobalFlag,                      // 09 Y Y
+	SystemNotImplemented2,                 // 10 Y N
+	SystemModuleInformation,               // 11 Y N
+	SystemLockInformation,                 // 12 Y N
+	SystemNotImplemented3,                 // 13 Y N
+	SystemNotImplemented4,                 // 14 Y N
+	SystemNotImplemented5,                 // 15 Y N
+	SystemHandleInformation,               // 16 Y N
+	SystemObjectInformation,               // 17 Y N
+	SystemPagefileInformation,             // 18 Y N
+	SystemInstructionEmulationCounts,      // 19 Y N
+	SystemInvalidInfoClass1,               // 20
+	SystemCacheInformation,                // 21 Y Y
+	SystemPoolTagInformation,              // 22 Y N
+	SystemProcessorStatistics,             // 23 Y N
+	SystemDpcInformation,                  // 24 Y Y
+	SystemNotImplemented6,                 // 25 Y N
+	SystemLoadImage,                       // 26 N Y
+	SystemUnloadImage,                     // 27 N Y
+	SystemTimeAdjustment,                  // 28 Y Y
+	SystemNotImplemented7,                 // 29 Y N
+	SystemNotImplemented8,                 // 30 Y N
+	SystemNotImplemented9,                 // 31 Y N
+	SystemCrashDumpInformation,            // 32 Y N
+	SystemExceptionInformation,            // 33 Y N
+	SystemCrashDumpStateInformation,       // 34 Y Y/N
+	SystemKernelDebuggerInformation,       // 35 Y N
+	SystemContextSwitchInformation,        // 36 Y N
+	SystemRegistryQuotaInformation,        // 37 Y Y
+	SystemLoadAndCallImage,                // 38 N Y
+	SystemPrioritySeparation,              // 39 N Y
+	SystemNotImplemented10,                // 40 Y N
+	SystemNotImplemented11,                // 41 Y N
+	SystemInvalidInfoClass2,               // 42
+	SystemInvalidInfoClass3,               // 43
+	SystemTimeZoneInformation,             // 44 Y N
+	SystemLookasideInformation,            // 45 Y N
+	SystemSetTimeSlipEvent,                // 46 N Y
+	SystemCreateSession,                   // 47 N Y
+	SystemDeleteSession,                   // 48 N Y
+	SystemInvalidInfoClass4,               // 49
+	SystemRangeStartInformation,           // 50 Y N
+	SystemVerifierInformation,             // 51 Y Y
+	SystemAddVerifier,                     // 52 N Y
+	SystemSessionProcessesInformation      // 53 Y N
+} SYSTEM_INFORMATION_CLASS;
+
+
+NTSTATUS WINAPI ZwQuerySystemInformation(
+	_In_        SYSTEM_INFORMATION_CLASS SystemInformationClass,
+	_Inout_     PVOID SystemInformation,
+	_In_        ULONG SystemInformationLength,
+	_Out_opt_   PULONG ReturnLength
+);
+
 UINT64 GetProcessPeb(	int PID)
 {
 	HANDLE m_ProcessHandle;
@@ -319,16 +385,50 @@ UINT64 GetProcessPeb(	int PID)
 
 			_PEB64* Peb = (_PEB64*)malloc(sizeof(_PEB64));
 			RTL_USER_PROCESS_PARAMETERS64* ProcessParameters = (RTL_USER_PROCESS_PARAMETERS64*)malloc(sizeof(RTL_USER_PROCESS_PARAMETERS64));
+			
 			Status = NtWow64ReadVirtualMemory64(m_ProcessHandle, (PVOID64)pbi.PebBaseAddress,(_PEB64*)Peb, sizeof(_PEB64), &ReturnLength);
+			CloseHandle(m_ProcessHandle);
 			return pbi.PebBaseAddress;
 		}
 	}
+	CloseHandle(m_ProcessHandle);
 	return 0;
+}
+VOID ReHookDbgUiRemoteBreakin(HANDLE hProcess)
+{
+	byte code3[] = { 0x48,0x83,0xEC,0x28,0x65,0x48,0x8B,0x04,0x25,0x60 };
+	BYTE INT3Code[] = { 0XCC };
+	ULONG64 pDbgUiRemoteBreakin = (ULONG64)GetProcAddress(GetModuleHandle(L"ntdll.dll"), "DbgUiRemoteBreakin");
+	ULONG64  INT3 = (ULONG64)GetProcAddress(GetModuleHandle(L"ntdll.dll"), "DbgBreakPoint");
+	DWORD64 Size = 0;
+    WriteProcessMemory(hProcess, (PVOID)pDbgUiRemoteBreakin, code3, 10, (SIZE_T *)&Size);
+	Size = 0;
+	WriteProcessMemory(hProcess, (PVOID)INT3, INT3Code, 1, (SIZE_T *)&Size);
+}
+VOID HideDebug(DWORD PID,UINT64 Peb)
+{
+	int Hide = 0;
+	DWORD Size = 0;
+	HANDLE m_ProcessHandle;
+	m_ProcessHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, PID);	
+	ReHookDbgUiRemoteBreakin(m_ProcessHandle);
+	while (1)
+	{
+		
+		WriteProcessMemory(m_ProcessHandle, (PVOID)(Peb + 0x002), &Hide, 4, (SIZE_T *)&Size);
+		Sleep(1000);
+		printf("调试隐藏中.\n");
+	
+	}
+}
+VOID PassBe(DWORD PID)
+{
+   HideDebug(PID, GetProcessPeb(PID));
 }
 int main()
 {
-	printf("%p\n", GetProcessPeb(9244));
-
+	PassBe(18092);
+	
 
 	
 	return 0;
