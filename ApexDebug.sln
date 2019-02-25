@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28307.271
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ApexDebug", "ApexDebug\ApexDebug.vcxproj", "{7262FF4E-1B2D-4554-BB51-A3799867BF91}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ApexR3", "ApexR3\ApexR3.vcxproj", "{E7A61ED8-4C35-4773-8E56-19B8F9D15CA9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -41,6 +43,18 @@ Global
 		{7262FF4E-1B2D-4554-BB51-A3799867BF91}.Release|x86.ActiveCfg = Release|Win32
 		{7262FF4E-1B2D-4554-BB51-A3799867BF91}.Release|x86.Build.0 = Release|Win32
 		{7262FF4E-1B2D-4554-BB51-A3799867BF91}.Release|x86.Deploy.0 = Release|Win32
+		{E7A61ED8-4C35-4773-8E56-19B8F9D15CA9}.Debug|ARM.ActiveCfg = Debug|Win32
+		{E7A61ED8-4C35-4773-8E56-19B8F9D15CA9}.Debug|ARM64.ActiveCfg = Debug|Win32
+		{E7A61ED8-4C35-4773-8E56-19B8F9D15CA9}.Debug|x64.ActiveCfg = Debug|x64
+		{E7A61ED8-4C35-4773-8E56-19B8F9D15CA9}.Debug|x64.Build.0 = Debug|x64
+		{E7A61ED8-4C35-4773-8E56-19B8F9D15CA9}.Debug|x86.ActiveCfg = Debug|Win32
+		{E7A61ED8-4C35-4773-8E56-19B8F9D15CA9}.Debug|x86.Build.0 = Debug|Win32
+		{E7A61ED8-4C35-4773-8E56-19B8F9D15CA9}.Release|ARM.ActiveCfg = Release|Win32
+		{E7A61ED8-4C35-4773-8E56-19B8F9D15CA9}.Release|ARM64.ActiveCfg = Release|Win32
+		{E7A61ED8-4C35-4773-8E56-19B8F9D15CA9}.Release|x64.ActiveCfg = Release|x64
+		{E7A61ED8-4C35-4773-8E56-19B8F9D15CA9}.Release|x64.Build.0 = Release|x64
+		{E7A61ED8-4C35-4773-8E56-19B8F9D15CA9}.Release|x86.ActiveCfg = Release|Win32
+		{E7A61ED8-4C35-4773-8E56-19B8F9D15CA9}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -55,7 +55,7 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT pPDriverObj, PUNICODE_STRING pRegistryPath)
 		T[i] = FastFunction::OpenThread(THREAD_ALL_ACCESS, FALSE, (DWORD)Tid[i]);
 		FastFunction::SuspendThread(T[i]);
 	}
-	PassPubgHook();
+	//PassPubgHook();
 	g_R3_ReadProcess.R3_ReadProcess_Start(pPDriverObj);
 	return STATUS_SUCCESS;
 
